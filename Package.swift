@@ -11,12 +11,17 @@ let package = Package(
             targets: ["ArchitectureKit"]),
     ],
     dependencies: [
-        .package(path: "../Utils"),
+        .package(
+            url: "git@github.com:IgorShevtshenko/Utils.git",
+            branch: "master"
+        ),
     ],
     targets: [
         .target(
             name: "ArchitectureKit",
-            dependencies: ["Utils"]
+            dependencies: [
+                .product(name: "Utils", package: "Utils")
+            ]
         ),
         .testTarget(
             name: "ArchitectureKitTests",
