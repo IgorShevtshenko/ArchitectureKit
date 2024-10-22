@@ -4,7 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "ArchitectureKit",
-    platforms: [.iOS(.v17), .macOS(.v10_15)],
+    platforms: [.iOS(.v17)],
     products: [
         .library(
             name: "ArchitectureKit",
@@ -13,7 +13,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "git@github.com:IgorShevtshenko/Utils.git",
-            .upToNextMajor(from: .init(1, 1, 2))
+            .upToNextMajor(from: .init(1, 2, 1))
         ),
     ],
     targets: [
@@ -22,9 +22,6 @@ let package = Package(
             dependencies: [
                 .product(name: "Utils", package: "Utils")
             ]
-        ),
-        .testTarget(
-            name: "ArchitectureKitTests",
-            dependencies: ["ArchitectureKit"]),
+        )
     ]
 )
