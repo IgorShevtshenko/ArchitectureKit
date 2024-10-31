@@ -28,6 +28,4 @@ open class ViewStatePublisher<State, Action>: ObservableObject {
     }
     
     open func send(_ action: Action) {}
-    
-    open func send(_ action: Action) async {}
 }
