@@ -2,27 +2,17 @@ import SwiftUI
 import Combine
 
 @MainActor
-public final class Presenter<
-    State,
-    Action,
-    Event: Sendable,
-    R
->: ObservableObject where
-    R: Reducer,
-    R.Event == Event,
-    R.State == State,
-    R.Action == Action
-{
+public final class Presenter<R: Reducer>: ObservableObject {
     
-    @Published public private(set) var state: State
+    @Published public private(set) var state: R.State
     
     private let reducer: R
     
-    private let eventSender = PassthroughSubject<Event, Never>()
+    private let eventSender = PassthroughSubject<R.Event, Never>()
     
     private var tasks: [Task<Void, Never>] = []
     
-    public init(initialState: State, reducer: R) {
+    public init(initialState: R.State, reducer: R) {
         self.state = initialState
         self.reducer = reducer
         
@@ -36,14 +26,15 @@ public final class Presenter<
         }
     }
     
-    public func send(_ action: Action) async {
+    public func send(_ action: R.Action) async {
         await reducer.transform(action, state: state, sendEvent: eventSender.send)
     }
 }
 
 public extension Presenter {
     
-    func send(_ action: Action) -> Task<Void, Never> {
+    @discardableResult
+    func send(_ action: R.Action) -> Task<Void, Never> {
         Task {
             await send(action)
         }
