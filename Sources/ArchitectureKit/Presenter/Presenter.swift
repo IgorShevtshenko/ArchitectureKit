@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 @MainActor
 public final class Presenter<
@@ -6,14 +7,18 @@ public final class Presenter<
     Action,
     Event: Sendable,
     R
->: ObservableObject where R: Reducer, R.Event == Event, R.State == State, R.Action == Action {
-    
-    public typealias State = State
-    public typealias Action = Action
+>: ObservableObject where
+    R: Reducer,
+    R.Event == Event,
+    R.State == State,
+    R.Action == Action
+{
     
     @Published public private(set) var state: State
     
     private let reducer: R
+    
+    private let eventSender = PassthroughSubject<Event, Never>()
     
     private var tasks: [Task<Void, Never>] = []
     
@@ -21,14 +26,18 @@ public final class Presenter<
         self.state = initialState
         self.reducer = reducer
         
+        eventSender
+            .scan(initialState, reducer.apply)
+            .prepend(initialState)
+            .assign(to: &$state)
+        
         reducer.prependActions.forEach { action in
             tasks.append(send(action))
         }
     }
     
     public func send(_ action: Action) async {
-        let event = await reducer.transform(action, state: state)
-        reducer.apply(event, on: &state)
+        await reducer.transform(action, state: state, sendEvent: eventSender.send)
     }
 }
 

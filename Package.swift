@@ -22,6 +22,13 @@ let package = Package(
             dependencies: [
                 .product(name: "Utils", package: "Utils")
             ]
+        ),
+        .testTarget(
+            name: "ArchitectureKitTests",
+            dependencies: [
+                "ArchitectureKit",
+                .product(name: "Utils", package: "Utils")
+            ]
         )
     ]
 )
